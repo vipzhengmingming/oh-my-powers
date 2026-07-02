@@ -1,0 +1,18 @@
+{
+  "name": "oh-my-powers",
+  "description": "A community-driven Claude Code plugin marketplace — superpowers for everyone",
+  "owner": {
+    "name": "oh-my-powers team"
+  },
+  "plugins": [
+    {
+      "name": "hello-world",
+      "source": "./plugins/hello-world",
+      "description": "A friendly hello-world plugin to get started with Claude Code plugins",
+      "version": "0.1.0",
+      "author": {
+        "name": "oh-my-powers team"
+      }
+    }
+  ]
+}
