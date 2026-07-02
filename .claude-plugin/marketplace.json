@@ -13,6 +13,15 @@
       "author": {
         "name": "oh-my-powers team"
       }
+    },
+    {
+      "name": "create-llm-wiki",
+      "source": "./plugins/create-llm-wiki",
+      "description": "LLM-maintained knowledge base — init, add content, visualize relationships",
+      "version": "0.1.0",
+      "author": {
+        "name": "oh-my-powers team"
+      }
     }
   ]
 }
