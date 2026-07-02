@@ -1,0 +1,7 @@
+{
+  "name": "create-llm-wiki",
+  "version": "0.1.0",
+  "description": "LLM-maintained knowledge base — init, add content, visualize relationships",
+  "author": { "name": "oh-my-powers team" },
+  "homepage": "https://github.com/zhengmingming/oh-my-powers"
+}
