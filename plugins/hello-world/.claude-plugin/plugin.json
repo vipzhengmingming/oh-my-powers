@@ -1,9 +1,0 @@
-{
-  "name": "hello-world",
-  "version": "0.1.0",
-  "description": "A friendly hello-world plugin — greet, learn, and extend",
-  "author": {
-    "name": "oh-my-powers team"
-  },
-  "homepage": "https://github.com/zhengmingming/oh-my-powers"
-}
