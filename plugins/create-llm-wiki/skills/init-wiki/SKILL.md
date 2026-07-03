@@ -34,4 +34,15 @@ Reference: `references/llm-wiki.md` for the full architectural rules.
    ```
    Use the actual current date in ISO format.
 
-6. Confirm to the user what was created, showing the full directory tree. Tell them they can now use `/create-llm-wiki:add-to-wiki` to add content.
+6. Ensure `./CLAUDE.md` has wiki reference rules:
+   - If `./CLAUDE.md` does not exist, create it with:
+     ```markdown
+     ## Knowledge Base
+
+     This project has an LLM-maintained wiki at `./llm-wiki/`.
+     When working on features, first check `./llm-wiki/index.md`
+     for relevant context. Read linked pages as needed.
+     ```
+   - If `./CLAUDE.md` already exists, check if it already has a "Knowledge Base" section. If not, append the same block at the end.
+
+7. Confirm to the user what was created, showing the full directory tree. Tell them they can now use `/create-llm-wiki:add-to-wiki` to add content.
