@@ -43,6 +43,20 @@ When the user discusses a topic they want captured:
 3. Follow the same update/create flow as file ingestion (steps 3-6 above).
 4. Confirm what was written and ask if they want to add more.
 
+## Post-Add Lint (Active Orchestration)
+
+After writing content, automatically run these checks in order:
+
+1. **Orphan check** — Scan if the new page has inbound `[[wikilinks]]` from any existing page. If not, update related pages to link to it.
+
+2. **Backlink sync** — For every `[[target]]` the new page references, check the target page also has a return link. Add if missing.
+
+3. **Gap detection** — Scan the new page for capitalized proper nouns or recurring concepts that don't have a wiki page yet. Suggest: "这个概念「XXX」还没有独立页面，要建一个吗？"
+
+4. **Index validation** — Confirm `index.md` categories still make sense. If a category has more than 8 entries, suggest splitting it.
+
+5. **Summary report** — Show a one-line summary of what was checked and any actions taken.
+
 ## General Rules
 
 - Use `[[page-name]]` Obsidian-compatible wikilinks when cross-referencing.
