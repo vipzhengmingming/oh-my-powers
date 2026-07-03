@@ -10,6 +10,7 @@ Inspired by the [LLM Wiki pattern](https://github.com/...), this plugin lets you
 |---------|-------------|
 | `/create-llm-wiki:init-wiki` | Initialize a new wiki in `./llm-wiki/` |
 | `/create-llm-wiki:add-to-wiki <path>` | Add a file or Q&A content to the wiki |
+| `/create-llm-wiki:graph-wiki [html\|obsidian]` | Generate a visual relationship graph |
 
 ## Agents
 
