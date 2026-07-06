@@ -1,6 +1,6 @@
 # create-llm-wiki
 
-LLM-maintained knowledge base for your project — part of the [oh-my-powers](https://github.com/zhengmingming/oh-my-powers) marketplace.
+LLM-maintained knowledge base for your project — part of the [oh-my-powers](https://github.com/vipzhengmingming/oh-my-powers) marketplace.
 
 Inspired by the [LLM Wiki pattern](https://github.com/...), this plugin lets you build a persistent, interlinked knowledge base incrementally as you work.
 
@@ -22,7 +22,7 @@ Inspired by the [LLM Wiki pattern](https://github.com/...), this plugin lets you
 
 ```bash
 # Add the marketplace
-/plugin marketplace add zhengmingming/oh-my-powers
+/plugin marketplace add vipzhengmingming/oh-my-powers
 
 # Install the plugin
 /plugin install create-llm-wiki@oh-my-powers
