@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 // wiki-export.js — Export LLM wiki to single file
 // Usage: node scripts/wiki-export.js <markdown|json> [output-path]
+// Env: LLM_WIKI_DIR — wiki directory path (default: ./llm-wiki)
 
 const fs = require("fs");
 const path = require("path");
 
-const WIKI_DIR = path.resolve(process.cwd(), "llm-wiki");
+const WIKI_DIR = path.resolve(process.cwd(), process.env.LLM_WIKI_DIR || "llm-wiki");
 const PAGES_DIR = path.join(WIKI_DIR, "pages");
 
 function main() {

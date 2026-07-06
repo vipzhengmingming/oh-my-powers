@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 // wiki-search.js — Search LLM wiki pages with keyword ranking
 // Usage: node scripts/wiki-search.js <query>
-// Input: query string as argument
+// Env: LLM_WIKI_DIR — wiki directory path (default: ./llm-wiki)
 // Output: ranked results with excerpts to stdout
 
 const fs = require("fs");
 const path = require("path");
 
-const WIKI_DIR = path.resolve(process.cwd(), "llm-wiki");
+const WIKI_DIR = path.resolve(process.cwd(), process.env.LLM_WIKI_DIR || "llm-wiki");
 const PAGES_DIR = path.join(WIKI_DIR, "pages");
 
 function main() {

@@ -20,13 +20,15 @@ Export the entire LLM wiki to a single portable file.
 
 ## Steps
 
-1. Ask user for format if not specified. Default to `markdown`.
+1. Determine the wiki directory. Check if `./llm-wiki/pages/` exists. If not, ask the user where the wiki is.
 
-2. Ask user for output path. Default to `./llm-wiki-export.md` (or `.json`).
+2. Ask user for format if not specified. Default to `markdown`.
 
-3. Run the export script:
+3. Ask user for output path. Default to `<wiki-dir>-export.md` (or `.json`).
+
+4. Run the export script with the wiki directory:
    ```
-   node ${CLAUDE_PLUGIN_ROOT}/scripts/wiki-export.js <format> <output-path>
+   LLM_WIKI_DIR=<wiki-dir> ${CLAUDE_PLUGIN_ROOT}/scripts/wiki-export.js <format> <output-path>
    ```
 
 4. Confirm the file was created with file size.
