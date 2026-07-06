@@ -14,7 +14,7 @@ function main() {
   const outputPath = process.argv[3];
 
   if (!fs.existsSync(PAGES_DIR)) {
-    console.error("No wiki found at ./llm-wiki/pages/");
+    console.error("No wiki found at " + PAGES_DIR);
     process.exit(1);
   }
 

@@ -23,7 +23,7 @@ Search the project's LLM wiki for relevant pages with ranked results.
    - Replace `<wiki-dir>` with the wiki path (e.g. `llm-wiki` or a custom path)
    - The script returns JSON with `[{ file, title, score, excerpt }]`
 
-2. Read the results. If results found, present them as a ranked list:
+3. Read the results. If results found, present them as a ranked list:
    - Show title, relevance score, and excerpt for each result
    - Offer to read the full page content
 

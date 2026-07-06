@@ -31,6 +31,6 @@ Export the entire LLM wiki to a single portable file.
    LLM_WIKI_DIR=<wiki-dir> ${CLAUDE_PLUGIN_ROOT}/scripts/wiki-export.js <format> <output-path>
    ```
 
-4. Confirm the file was created with file size.
+5. Confirm the file was created with file size.
 
 5. If the user wants to export to Obsidian-compatible format, remind them the wiki already uses `[[wikilinks]]` — they can just open the `./llm-wiki/` folder directly in Obsidian.
