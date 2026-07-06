@@ -11,14 +11,13 @@ A community-driven **Claude Code plugin marketplace** — superpowers for everyo
 /plugin marketplace add vipzhengmingming/oh-my-powers
 
 # Install a plugin
-/plugin install hello-world@oh-my-powers
+/plugin install create-llm-wiki@oh-my-powers
 ```
 
 ## Available Plugins
 
 | Plugin | Description |
 |--------|-------------|
-| [hello-world](./plugins/hello-world) | A friendly hello-world plugin to get started |
 | [create-llm-wiki](./plugins/create-llm-wiki) | LLM-maintained knowledge base — init, add content, visualize relationships |
 
 ## Creating a Plugin
