@@ -4,18 +4,19 @@
 
 **Goal:** Build a Claude Code plugin that creates and maintains LLM-driven knowledge bases in any project.
 
-**Architecture:** Plugin with 2 user-invoked skills (init-wiki, add-to-wiki), 1 autonomous agent (wiki-grapher), 1 rendering script (graph-viz.js), and 1 reference file (llm-wiki.md). All components live under `plugins/create-llm-wiki/`.
+**Architecture:** Plugin with 5 user-invoked skills (init-wiki, add-to-wiki, graph-wiki, search-wiki, export-wiki), 1 autonomous agent (wiki-grapher), 3 scripts (graph-viz.js, wiki-search.js, wiki-export.js), and 1 reference file (llm-wiki.md). All components live under `plugins/create-llm-wiki/`.
 
 **Tech Stack:** SKILL.md (markdown with YAML frontmatter), Agent markdown config, Node.js (no npm deps, D3.js via CDN)
 
 ## Global Constraints
 
 - Plugin name: `create-llm-wiki`
-- Skill namespaced as `/create-llm-wiki:init-wiki` and `/create-llm-wiki:add-to-wiki`
+- Skill namespaced as `/create-llm-wiki:init-wiki`, `/create-llm-wiki:add-to-wiki`, `/create-llm-wiki:graph-wiki`, `/create-llm-wiki:search-wiki`, `/create-llm-wiki:export-wiki`
 - Wiki directory: `./llm-wiki/` relative to project root
 - All prompts reference `references/llm-wiki.md` for rules
-- graph-viz.js: zero npm dependencies, D3.js via CDN
+- graph-viz.js, wiki-search.js, wiki-export.js: zero npm dependencies, D3.js via CDN
 - Agent script uses `${CLAUDE_PLUGIN_ROOT}` for portability
+- wiki-search.js and wiki-export.js accept `LLM_WIKI_DIR` env var for custom wiki path
 
 ---
 

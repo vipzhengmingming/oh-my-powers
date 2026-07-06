@@ -8,7 +8,7 @@
 
 ## Overview
 
-`create-llm-wiki` is a Claude Code plugin that enables LLM-maintained, persistent knowledge bases directly inside any project. Inspired by the [LLM Wiki pattern](../../references/llm-wiki.md), it provides three operations: initialize a wiki structure, add content from files or conversation, and generate visual relationship graphs.
+`create-llm-wiki` is a Claude Code plugin that enables LLM-maintained, persistent knowledge bases directly inside any project. Inspired by the [LLM Wiki pattern](../../references/llm-wiki.md), it provides five operations: initialize a wiki, add content from files or conversation, search, export, and generate visual relationship graphs.
 
 The wiki lives in the project directory (`./llm-wiki/`) as plain markdown files — no external database, no embedding infrastructure. The LLM handles all the bookkeeping.
 
@@ -21,7 +21,9 @@ User command → Skill/Agent → reads/writes → ./llm-wiki/
                                    │
                           reads rules from → references/llm-wiki.md
                                    │
-                          calls for HTML → scripts/graph-viz.js
+                          calls scripts → scripts/graph-viz.js
+                                          scripts/wiki-search.js
+                                          scripts/wiki-export.js
 ```
 
 **Three layers** (from LLM Wiki pattern):
@@ -39,11 +41,16 @@ plugins/create-llm-wiki/
 │   └── plugin.json                  ← Plugin manifest
 ├── skills/
 │   ├── init-wiki/SKILL.md           ← /create-llm-wiki:init-wiki
-│   └── add-to-wiki/SKILL.md         ← /create-llm-wiki:add-to-wiki
+│   ├── add-to-wiki/SKILL.md         ← /create-llm-wiki:add-to-wiki
+│   ├── graph-wiki/SKILL.md          ← /create-llm-wiki:graph-wiki [html|obsidian]
+│   ├── search-wiki/SKILL.md         ← /create-llm-wiki:search-wiki <query>
+│   └── export-wiki/SKILL.md         ← /create-llm-wiki:export-wiki [format] [path]
 ├── agents/
-│   └── wiki-grapher.md              ← wiki-grapher agent
+│   └── wiki-grapher.md              ← wiki-grapher agent (batch import + health check)
 ├── scripts/
-│   └── graph-viz.js                 ← D3.js HTML renderer
+│   ├── graph-viz.js                 ← D3.js HTML renderer
+│   ├── wiki-search.js               ← Keyword search with ranking (env: LLM_WIKI_DIR)
+│   └── wiki-export.js               ← Export to single markdown or JSON (env: LLM_WIKI_DIR)
 ├── references/
 │   └── llm-wiki.md                  ← Core rules (from user)
 └── README.md
@@ -63,7 +70,8 @@ plugins/create-llm-wiki/
    - `pages/` — for LLM-generated wiki pages
 2. Create `index.md` as a categorized catalog of all pages (initially empty skeleton)
 3. Create `log.md` with initial entry marking wiki creation
-4. Output confirmation and usage hints to user
+4. Ensure `./CLAUDE.md` has wiki reference rules (create or append)
+5. Output confirmation and usage hints to user
 
 **SKILL.md structure:**
 - Frontmatter: `name`, `description` with trigger phrases, `argument-hint: [wiki-dir]`
@@ -89,6 +97,11 @@ plugins/create-llm-wiki/
 5. Ensure cross-links between related pages
 6. Update `index.md` with new/changed entries
 7. Append entry to `log.md` with consistent prefix format
+8. **Post-add lint** (active orchestration):
+   - Orphan check: scan inbound [[links]] for the new page, add if missing
+   - Backlink sync: for every [[target]] referenced, ensure return link exists
+   - Gap detection: suggest new pages for concepts mentioned but not covered
+   - Index validation: ensure categories are still well-balanced
 
 **SKILL.md structure:**
 - Frontmatter: `name`, `description` with trigger phrases, `argument-hint: [file-path-or-topic]`
@@ -97,21 +110,20 @@ plugins/create-llm-wiki/
 
 ### 3. `wiki-grapher` Agent
 
-**Trigger:** User says "生成图谱" / "graph the wiki" / "看看知识关联"
+**Trigger:** User says "批量导入" / "健康检查" / "wiki health" / "batch import"
 
-**Required tools:** Read, Write, Edit, Bash
+**Required tools:** Read, Write, Edit, Bash, WebSearch
 
 **Behavior:**
-1. Scan `./llm-wiki/pages/*.md` for content and `[[wikilinks]]`
-2. Build graph data: nodes = pages, edges = cross-references/shared concepts
-3. Ask user for output format:
-   - **HTML** → pipe JSON to `scripts/graph-viz.js` → `./llm-wiki/graph.html`
-   - **Obsidian** → add/update `[[wikilinks]]` in page files → user opens Obsidian Graph View
 
-**Agent prompt requirements:**
-- `<examples>` block showing sample user requests
-- Clear instruction to check both existing wikilinks and content for relationship extraction
-- Output format guidance
+**Mode 1: Batch Import**
+- Scan multiple files, dedup against existing index, group similar files by topic, compose a single wiki page per group, batch update index.md and log.md.
+
+**Mode 2: Health Check**
+- Run checks: orphan pages, dead [[links]], stale pages (>30d no update), index drift, overcrowded categories, gap mentions, contradictions.
+- Generate summary report and ask user if they want to auto-fix.
+
+**Graph generation is handled by the `graph-wiki` skill, not the agent.**
 
 ### 4. `graph-viz.js` Script
 
@@ -140,6 +152,46 @@ plugins/create-llm-wiki/
 - Click to highlight connected nodes
 
 ---
+
+### 5. `graph-wiki` Skill
+
+**Trigger:** `/create-llm-wiki:graph-wiki [html|obsidian]` or "生成图谱" / "graph the wiki"
+
+**Behavior:**
+1. Scan wiki pages for content and `[[wikilinks]]`
+2. Build graph data (nodes + edges)
+3. Ask user for format (or use argument): HTML → pipe to `scripts/graph-viz.js`; Obsidian → update `[[wikilinks]]` in pages
+
+### 6. `search-wiki` Skill
+
+**Trigger:** `/create-llm-wiki:search-wiki <query>` or "搜索"
+
+**Behavior:**
+1. Determine wiki directory (default `./llm-wiki/`)
+2. Run `LLM_WIKI_DIR=<dir> scripts/wiki-search.js <query>`
+3. Present ranked results with excerpts
+
+### 7. `export-wiki` Skill
+
+**Trigger:** `/create-llm-wiki:export-wiki [format] [output-path]` or "导出"
+
+**Behavior:**
+1. Determine wiki directory
+2. Run `LLM_WIKI_DIR=<dir> scripts/wiki-export.js <format> <output-path>`
+3. Confirm exported file with size
+
+### 8. `wiki-search.js` Script
+
+**Type:** Node.js, no deps
+**Input:** Query string via argv
+**Output:** JSON `[{ file, title, score, excerpt }]` via stdout
+**Feature:** Keyword frequency scoring, title/heading bonus, excerpt extraction. Accepts `LLM_WIKI_DIR` env var.
+
+### 9. `wiki-export.js` Script
+
+**Type:** Node.js, no deps
+**Input:** Format (`markdown` / `json`) + optional output path via argv
+**Output:** Single merged file. Accepts `LLM_WIKI_DIR` env var.
 
 ## Knowledge Base Structure (`./llm-wiki/`)
 
@@ -192,18 +244,21 @@ llm-wiki/
 | Question | Decision |
 |----------|----------|
 | Plugin name | `create-llm-wiki` |
-| Skill naming | `init-wiki`, `add-to-wiki` (self-explanatory) |
-| Wiki location | `./llm-wiki/` in project root |
+| Skill naming | `init-wiki`, `add-to-wiki`, `graph-wiki`, `search-wiki`, `export-wiki` |
+| Wiki location | `./llm-wiki/` in project root (overridable via `LLM_WIKI_DIR`) |
 | Add input modes | Both file and Q&A |
-| Graph output | HTML (D3.js) and Obsidian [[links]], user chooses |
+| Add post-add lint | Orphan check, backlink sync, gap detection, index validation |
+| Graph output | Skill `/create-llm-wiki:graph-wiki` (not agent) |
+| Search & Export | Skills + Node.js scripts with `LLM_WIKI_DIR` env var |
+| Batch & Health Check | wiki-grapher agent, conversation-triggered |
 | Architecture | Skill + Agent + Script (方案 C) |
 
 ---
 
 ## Next Steps
 
-1. Create plugin directory and files
-2. Implement each component
-3. Validate with plugin-validator
-4. Register in oh-my-powers marketplace.json
-5. Test in Claude Code
+1. Create plugin directory and files ✅
+2. Implement each component ✅
+3. Validate with plugin-validator ✅
+4. Register in oh-my-powers marketplace.json ✅
+5. Test in Claude Code 🔲
